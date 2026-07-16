@@ -1,5 +1,5 @@
 {
-  "name": "@pokerhawk/blind-structure",
+  "name": "@tourneytek/blind-structure",
   "version": "0.1.0",
   "description": "Generate poker blind structures from player count, stack, and target duration — chip-denomination aware, with breaks, antes and chip-ups. Zero dependencies.",
   "keywords": ["poker", "blinds", "blind-structure", "tournament", "chip-denominations", "ante", "chip-up", "blind-timer"],

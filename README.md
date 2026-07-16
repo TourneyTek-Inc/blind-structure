@@ -1,7 +1,7 @@
-# @pokerhawk/blind-structure
+# @tourneytek/blind-structure
 
 [![CI](https://github.com/TourneyTek-Inc/blind-structure/actions/workflows/ci.yml/badge.svg)](https://github.com/TourneyTek-Inc/blind-structure/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@pokerhawk/blind-structure.svg)](https://www.npmjs.com/package/@pokerhawk/blind-structure)
+[![npm](https://img.shields.io/npm/v/@tourneytek/blind-structure.svg)](https://www.npmjs.com/package/@tourneytek/blind-structure)
 [![types](https://img.shields.io/badge/types-included-3178C6.svg)](https://www.typescriptlang.org/)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
@@ -12,11 +12,11 @@ Zero dependencies. One pure function. Ships ESM + CJS with types.
 Extracted from [Poker Hawk](https://www.pokerhawk.io).
 
 ```bash
-npm install @pokerhawk/blind-structure
+npm install @tourneytek/blind-structure
 ```
 
 ```ts
-import { generateBlindStructure } from '@pokerhawk/blind-structure';
+import { generateBlindStructure } from '@tourneytek/blind-structure';
 
 const schedule = generateBlindStructure({
   playerCount: 8,
@@ -71,7 +71,7 @@ schedule.filter((e) => e.type === 'chip-up');
 The result is a discriminated union — `type: 'blind'` entries carry blinds and an ante; `type: 'break' | 'chip-up'` entries carry only a duration:
 
 ```ts
-import { blindLevelsOnly, scheduleDurationMins } from '@pokerhawk/blind-structure';
+import { blindLevelsOnly, scheduleDurationMins } from '@tourneytek/blind-structure';
 
 blindLevelsOnly(schedule); // just the playing levels
 scheduleDurationMins(schedule); // total minutes, breaks included
