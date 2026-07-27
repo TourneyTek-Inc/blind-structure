@@ -205,6 +205,10 @@ export function generateBlindStructure(params: BlindStructureParams): ScheduleEn
   let currentBB = initialBigBlind;
   let prevRoundingBase = smallest;
   let chipUpPending = false;
+  // Blinds of the previous *blind* level (breaks and chip-ups carry none),
+  // so each level can be forced strictly above the one before it.
+  let prevSB: number | null = null;
+  let prevBB: number | null = null;
 
   for (let i = 0; i < totalLevels; i++) {
     const roundingBase = getDynamicRoundingBase(currentBB, chipDenoms, multiplier, roundingThresholdFactor);
@@ -216,14 +220,31 @@ export function generateBlindStructure(params: BlindStructureParams): ScheduleEn
 
     // Never round a blind away to nothing: a level with a 0 small blind
     // isn't a level.
-    const sbRounded = Math.max(roundToNearestDenom(currentSB, roundingBase), roundingBase);
+    let sbRounded = Math.max(roundToNearestDenom(currentSB, roundingBase), roundingBase);
     let bbRounded = Math.max(roundToNearestDenom(currentBB, roundingBase), roundingBase);
+
+    // A level whose blinds equal the level before it isn't a level: the
+    // pressure never goes up and 20 minutes of clock burn for nothing.
+    // Rounding causes this whenever the geometric step between two levels
+    // is smaller than the denomination they both round to (e.g. 100/200
+    // twice in a row on 100-chips). Promote by one rounding step until the
+    // level is strictly above its predecessor — the raw curve is left
+    // untouched, so the schedule re-converges on the intended shape.
+    if (prevSB !== null) {
+      while (sbRounded <= prevSB) sbRounded += roundingBase;
+    }
 
     if (bbRule === 'double') {
       bbRounded = roundToNearestDenom(sbRounded * 2, roundingBase);
     } else if (bbRule === 'min1_5x') {
       const minBB = sbRounded * 1.5;
       if (bbRounded < minBB) bbRounded = roundToNearestDenom(minBB, roundingBase);
+    }
+
+    // The big blind has to climb too — `bbRule` can hold it flat even when
+    // the small blind moved (and with no rule at all it rounds on its own).
+    if (prevBB !== null) {
+      while (bbRounded <= prevBB) bbRounded += roundingBase;
     }
 
     schedule.push({
@@ -234,6 +255,9 @@ export function generateBlindStructure(params: BlindStructureParams): ScheduleEn
       ante: computeAnte({ anteRule, antePercent, sbRounded, bbRounded, roundingBase, smallest }),
       durationMins: levelDurationMins,
     });
+
+    prevSB = sbRounded;
+    prevBB = bbRounded;
 
     currentSB *= multiplier;
     currentBB *= multiplier;

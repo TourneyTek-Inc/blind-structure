@@ -211,3 +211,84 @@ describe('generateBlindStructure', () => {
     });
   });
 });
+
+describe('blind levels always escalate', () => {
+  // Regression: rounding to a coarse denomination could emit two identical
+  // consecutive levels (e.g. 100/200 then 100/200 again) whenever the
+  // geometric step was smaller than the rounding base. A level that doesn't
+  // raise the blinds is 20 minutes of dead clock.
+  const strictlyIncreasing = (p: BlindStructureParams): string | null => {
+    const levels = blindLevelsOnly(generateBlindStructure(p));
+    for (let i = 1; i < levels.length; i++) {
+      const prev = levels[i - 1];
+      const cur = levels[i];
+      if (cur.smallBlind <= prev.smallBlind) {
+        return `SB did not rise at level ${cur.level}: ${prev.smallBlind} -> ${cur.smallBlind}`;
+      }
+      if (cur.bigBlind <= prev.bigBlind) {
+        return `BB did not rise at level ${cur.level}: ${prev.bigBlind} -> ${cur.bigBlind}`;
+      }
+    }
+    return null;
+  };
+
+  it('never repeats the previous level (the reported 100/200 twice case)', () => {
+    // Poker Hawk desktop defaults — reproduced L3==L4 and L6==L7 before the fix.
+    expect(
+      strictlyIncreasing(
+        params({
+          playerCount: 18,
+          startingStack: 20_000,
+          tournamentLengthHrs: 4,
+          levelDurationMins: 20,
+        }),
+      ),
+    ).toBeNull();
+  });
+
+  it('holds across a broad parameter sweep', () => {
+    const failures: string[] = [];
+    for (const playerCount of [2, 6, 9, 18, 45, 200]) {
+      for (const startingStack of [1_000, 10_000, 20_000, 100_000]) {
+        for (const tournamentLengthHrs of [1, 3, 4, 8]) {
+          for (const levelDurationMins of [10, 15, 20, 30]) {
+            for (const bbRule of ['double', 'min1_5x', 'none'] as const) {
+              const failure = strictlyIncreasing(
+                params({ playerCount, startingStack, tournamentLengthHrs, levelDurationMins, bbRule }),
+              );
+              if (failure) {
+                failures.push(
+                  `${playerCount}p/${startingStack}/${tournamentLengthHrs}h/${levelDurationMins}m/${bbRule}: ${failure}`,
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+
+  it('holds across chip sets and rounding factors', () => {
+    const failures: string[] = [];
+    const chipSets = [
+      [25, 100, 500, 1_000, 5_000],
+      [1, 5, 25, 100],
+      [100, 500, 1_000],
+      [5, 25, 100, 500, 1_000, 5_000, 25_000],
+    ];
+    for (const chipDenoms of chipSets) {
+      for (const roundingThresholdFactor of [0.5, 1, 1.5, 2]) {
+        for (const blindFactor of [0.5, 1, 1.5]) {
+          const failure = strictlyIncreasing(
+            params({ chipDenoms, roundingThresholdFactor, blindFactor, playerCount: 18, startingStack: 20_000 }),
+          );
+          if (failure) {
+            failures.push(`[${chipDenoms.join(',')}] rtf=${roundingThresholdFactor} bf=${blindFactor}: ${failure}`);
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+});
