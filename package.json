@@ -1,11 +1,23 @@
 {
   "name": "@tourneytek/blind-structure",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate poker blind structures from player count, stack, and target duration — chip-denomination aware, with breaks, antes and chip-ups. Zero dependencies.",
-  "keywords": ["poker", "blinds", "blind-structure", "tournament", "chip-denominations", "ante", "chip-up", "blind-timer"],
+  "keywords": [
+    "poker",
+    "blinds",
+    "blind-structure",
+    "tournament",
+    "chip-denominations",
+    "ante",
+    "chip-up",
+    "blind-timer"
+  ],
   "homepage": "https://github.com/TourneyTek-Inc/blind-structure#readme",
   "bugs": "https://github.com/TourneyTek-Inc/blind-structure/issues",
-  "repository": { "type": "git", "url": "git+https://github.com/TourneyTek-Inc/blind-structure.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TourneyTek-Inc/blind-structure.git"
+  },
   "license": "MIT",
   "author": "Tyler Henson <tyler.henson@tourneytek.com> (https://www.pokerhawk.io)",
   "type": "module",
@@ -13,14 +25,32 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js", "require": "./dist/index.cjs" } },
-  "files": ["dist"],
-  "engines": { "node": ">=18" },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "build": "tsup", "test": "vitest run", "test:watch": "vitest",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run typecheck && npm run test && npm run build"
   },
-  "devDependencies": { "tsup": "^8.3.5", "typescript": "^5.7.2", "vitest": "^2.1.8" },
-  "publishConfig": { "access": "public" }
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
