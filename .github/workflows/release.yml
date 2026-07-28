@@ -60,16 +60,6 @@ jobs:
           fi
           echo "publishing $(node -p "require('./package.json').name")@$PKG"
 
-      - name: TEMP oidc diagnostics
-        run: |
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL   = ${ACTIONS_ID_TOKEN_REQUEST_URL:+SET}${ACTIONS_ID_TOKEN_REQUEST_URL:-UNSET}"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN = ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+SET}${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-UNSET}"
-          echo "NODE_AUTH_TOKEN                = ${NODE_AUTH_TOKEN:+SET}${NODE_AUTH_TOKEN:-UNSET}"
-          echo "NPM_CONFIG_USERCONFIG          = ${NPM_CONFIG_USERCONFIG:-UNSET}"
-          echo "registry = $(npm config get registry)"
-          echo "--- userconfig .npmrc ---"
-          cat "${NPM_CONFIG_USERCONFIG:-/dev/null}" 2>/dev/null | sed 's/=.*/=<redacted>/' || echo "(none)"
-
       - run: npm run typecheck
       - run: npm run test
       - run: npm run build
@@ -77,4 +67,4 @@ jobs:
       # No NODE_AUTH_TOKEN. Authentication is the OIDC token minted by the
       # id-token permission above. Provenance is generated automatically
       # for trusted publishes from a public repo.
-      - run: npm publish --access public --loglevel silly
+      - run: npm publish --access public
