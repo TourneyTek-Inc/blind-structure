@@ -3,7 +3,17 @@
 All notable changes to this project are documented here. This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.2.0
+## 1.0.0
+
+Stable release. Promotes the package out of `0.x` to declare the public API
+settled and supported under Semantic Versioning; breaking changes from here
+require a major bump. Carries the repeated-level fix below.
+
+### Changed
+
+- Release workflow no longer sets `registry-url` on `actions/setup-node`,
+  which was suppressing OIDC trusted publishing. Publishes again carry a
+  provenance attestation.
 
 ### Fixed
 
@@ -23,7 +33,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `… 100/200, 100/200, 200/400, 500/1000, 500/1000 …` to
   `… 100/200, 200/400, 300/600, 500/1000, 1000/2000 …`.
 
-  This changes generated output, hence the minor bump.
+  This changes generated output.
 
 ## 0.1.0
 
