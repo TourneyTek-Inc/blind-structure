@@ -4,3 +4,7 @@ coverage/
 *.log
 .DS_Store
 differential.test.ts
+
+# Role and desk skills are symlinks into ../../_agents/skills. Never commit them:
+# a cross-repo symlink resolves on this Mac and is a dangling path in a CI checkout.
+.claude/skills/*
