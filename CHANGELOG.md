@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.1.0 — unreleased
+## 1.1.0 — 2026-10-05
 
 Two fixes that change the structure generated for almost every input. No
 API changes: the same options, the same result shape.
