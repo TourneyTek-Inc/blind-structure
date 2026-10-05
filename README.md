@@ -50,17 +50,17 @@ schedule.filter((e) => e.type === 'chip-up');
 // → the breaks where a denomination just left play
 ```
 
-`roundingThresholdFactor` tunes how eagerly that promotion happens — raise it to keep smaller chips in play longer.
+`roundingThresholdFactor` tunes how eagerly that promotion happens — raise it to keep smaller chips in play longer. Two things can also hold a promotion back a level or two: a chip so coarse that the remaining levels, each one chip higher than the last, would carry the big blind past the chips in play; and a promotion that would floor the small blind straight up to one whole new chip (100/200 to 500/1000) in a single step.
 
 ## Options
 
 | Option | Meaning |
 | --- | --- |
-| `playerCount`, `startingStack` | Together set the chips in play. The final big blind targets 7% of that. |
+| `playerCount`, `startingStack` | Together set the chips in play. The final big blind targets 7% of that, and never exceeds 10%. |
 | `tournamentLengthHrs` | Target running time. **An hour of padding is added** so a structure that runs long doesn't fall off the end. |
 | `levelDurationMins` | Minutes per level. |
 | `chipDenoms` | Denominations on the table. Required — this drives all rounding. |
-| `blindFactor` | Escalation shape. `1` spreads the climb evenly; higher accelerates, lower flattens. |
+| `blindFactor` | Shape of the climb — never where it ends. `1` is an even geometric climb; higher front-loads it (blinds rise faster early, then ease into the finish); below `1` back-loads it (low for longer, steeper at the end). Must be positive. |
 | `roundingThresholdFactor` | How eagerly the rounding base promotes. `1` is the default cadence. |
 | `breakFrequency`, `breakDurationMins` | Break every N levels. Omit for none. |
 | `includeChipUp` | Mark a break as `chip-up` when the denomination promotes. |
@@ -82,9 +82,11 @@ scheduleDurationMins(schedule); // total minutes, breaks included
 - **Blinds are never zero.** See below.
 - **Blinds only ever use payable denominations** — every value is a multiple of your smallest chip.
 - **Blinds escalate monotonically.** No level is cheaper than the one before it.
-- **Antes never exceed the big blind**, and never fall below the smallest chip (an ante you can't pay isn't an ante).
+- **The last big blind stays inside the chips in play** — at most 10% of them. The one exception is a field too small for the clock: every level has to rise by at least one chip, so 40 levels of 25s cannot fit under 10% of 6,000 chips.
+- **No level more than 2.5× the one before it**, whenever the curve itself climbs no faster than that. Rounding to chips is not allowed to turn a gentle step into a jump. (If the time allows too few levels for the climb, the curve's own steps are steeper than 2.5× and are left alone.)
+- **Antes never go backwards**, never exceed the big blind, and are always paid in chips still on the table — never one a chip-up break has already coloured up (without chip-up breaks, never one smaller than the blinds are using). A `bb_percent` ante rounds to the biggest such chip that fits inside it, so 12.5% of 10,000 is one 1,000 chip, not fifty 25s.
 - **A break is never the last thing on the schedule** — that's just an early night.
-- Bad input returns `[]` rather than throwing: no denominations, non-positive denominations, or a non-positive level duration.
+- Bad input returns `[]` rather than throwing: no denominations, non-positive denominations, a non-positive level duration, or a non-positive `blindFactor`.
 
 ## The zero-blind bug
 
