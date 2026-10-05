@@ -14,7 +14,13 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["ubuntu-latest"]') }}
+    # ALWAYS GitHub-hosted, whatever CI_RUNS_ON says. npm's provenance
+    # signing only accepts GitHub-hosted runners: 1.1.0's first publish ran
+    # on the self-hosted lane and the registry refused it with `E422 ...
+    # Error verifying sigstore provenance bundle: Unsupported GitHub Actions
+    # runner environment`. CI can stay self-hosted; publishing cannot. This
+    # repo is public, so the minutes are free.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
