@@ -3,6 +3,23 @@
 All notable changes to this project are documented here. This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.1 — 2026-10-06
+
+### Fixed
+
+- **With `bbRule: 'none'` the small blind could equal the big blind.**
+  Nothing tied the two together under `'none'`: each was rounded on its
+  own, and on a coarse chip the rule that every blind rises each level
+  pushed both up one chip at a time until they met — 60 players × 12,000,
+  8 hours, 20-minute levels on a 25…25,000 set ran 2000/2000, 3000/3000
+  … 60000/60000 from level 10 to the end. 297 of 300 sampled `'none'`
+  schedules had at least one such level.
+
+  The big blind is now always at least one chip above the small blind,
+  for every rule. `'double'` and `'min1_5x'` output is unchanged; `'none'`
+  still applies no ratio, so a late `'none'` level can sit one chip apart
+  (55000/60000).
+
 ## 1.1.0 — 2026-10-05
 
 Two fixes that change the structure generated for almost every input. No
