@@ -332,6 +332,10 @@ export function generateBlindStructure(params: BlindStructureParams): ScheduleEn
         bb = Math.min(bb, Math.max(limitOn(prev.bb), bbFloor));
       }
     }
+    // The small blind is the smaller blind, whatever the rule. Under 'none'
+    // nothing else ties the two together, and on a coarse chip both climb
+    // one chip a level until the small blind catches the big one.
+    if (bb <= sb) bb = (Math.floor(sb / base) + 1) * base;
     return { sb, bb };
   };
 
